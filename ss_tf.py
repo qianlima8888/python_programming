@@ -35,21 +35,34 @@ def decode_ss_url(ssurl):
     print(remark, ip_addr, port, method, password)
     return [remark, ip_addr, port, method, password]
 
-def decode_first(first):
-    de_url =get_split(str(base_decode(first))[2:-2], ":");
+def decode_first(first, is_base64):
+    if(is_base64 == 1):
+        de_url = get_split(str(base_decode(first))[2:-2], ":")
+    else:
+        de_url = get_split(first, ":")
     de_url[5] = str(base_decode(de_url[5]))[2:-2]
     print(de_url)
     return de_url
 
-def decode_second(second):
+def decode_second(second, is_base64):
     dic_url = {"obfsparam" : "", "protoparam" : "", "remarks" : "", "group" : ""}
-    de_url =get_split(str(base_decode(second))[2:-2], "&");
+    if(is_base64 == 1):
+        de_url =get_split(str(base_decode(second))[2:-2], "&")
+    else:
+        de_url = get_split(second, "&")
     for strs in de_url:
         dic_url[strs.split("=")[0]] = str(base_decode(strs.split("=")[1]))[2:-2]
         print(base_decode(strs.split("=")[1]))
     de_url = [dic_url["obfsparam"], dic_url["protoparam"], dic_url["remarks"], dic_url["group"] ]
     print(de_url)
     return de_url
+
+def get_para(ssurl, strs, is_base64):
+    first = ssurl.split(strs)[0]
+    second = ssurl.split(strs)[1]
+    ip_addr, port, protocol, method, obfs, password = decode_first(first,  is_base64)
+    obfsparam, protoparam, remarks, group = decode_second(second, is_base64)
+    return [ip_addr, port, protocol, method, obfs, password, obfsparam, protoparam, remarks, group]
 
 def decode_ssr_url(ssurl):
     ip_addr = ""
@@ -63,11 +76,9 @@ def decode_ssr_url(ssurl):
     remarks = ""
     group = ""
     if("_" in ssurl):
-        first = ssurl.split("_")[0]
-        second = ssurl.split("_")[1]
-        ip_addr, port , protocol, method, obfs, password = decode_first(first)
-        obfsparam, protoparam, remarks, group = decode_second(second)
-    
+        ip_addr, port, protocol, method, obfs, password, obfsparam, protoparam, remarks, group = get_para(ssurl, "_", 1)
+    if("_" not in ssurl):
+        ip_addr, port, protocol, method, obfs, password, obfsparam, protoparam, remarks, group = get_para(str(base_decode(ssurl))[2:-2], "/?",  0)
     print("end decode")
 
 
@@ -78,7 +89,6 @@ if("ss://" in ssurl):
     print("get ss url!\nstart decode.....")
     ssurl = ssurl[5:]
     decode_ss_url(ssurl)
-    
 elif("ssr://" in ssurl):
     print("get ssr url!\nstart decode.....")
     ssurl = ssurl[6:]
