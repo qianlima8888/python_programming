@@ -30,7 +30,7 @@ with open('hkStock.csv', 'w', newline='', encoding='gb2312') as file:
         url = "https://datacenter.eastmoney.com/securities/api/data/v1/get?reportName=RPT_HKF10_INFO_SECURITYINFO%3BRPT_HKF10_INFO_ORGPROFILE&columns=SECUCODE%2CSECURITY_CODE%2CSECURITY_NAME_ABBR%2CSECURITY_TYPE%2CLISTING_DATE%2CBOARD%2CTRADE_UNIT%2CTRADE_MARKET%2C%40SECUCODE%3B%40SECUCODE%2CORG_NAME%2CREG_PLACE%2CBELONG_INDUSTRY%2CFOUND_DATE%2CORG_WEB%2CCHAIRMAN&quoteColumns=&filter=(SECUCODE%3D%22{}.HK%22)&pageNumber=1&pageSize=200&sortTypes=&sortColumns=&source=F10&client=PC&v=027911191783349953".format(stockCode)
         data = requests.get(url)
         tradeUnit = data.json()['result']['data'][0]['TRADE_UNIT']
-        data = [stockCode, stockName, price, tradeUnit, int(price*tradeUnit)]
+        data = [stockCode, stockName, price, tradeUnit, int(price*tradeUnit) if price != '-' else '-' ]
         writer.writerow(data)
 
 
